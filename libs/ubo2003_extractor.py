@@ -7,6 +7,7 @@ BTFDBB UBO2003(*)形式, ATRIUM(**)形式のzipファイルを参照し、
 (*) http://cg.cs.uni-bonn.de/en/projects/btfdbb/download/ubo2003/
 (**) http://cg.cs.uni-bonn.de/en/projects/btfdbb/download/atrium/
 """
+from sys import stderr
 from typing import Set, Tuple
 from zipfile import ZipFile
 
@@ -55,7 +56,11 @@ class BtfFromZip:
         if found_files == 0:
             raise ValueError(f"'{filename}' does not exist in '{self.zip_filepath}'.")
         elif found_files > 1:
-            print("WARN:", f"'{self.zip_filepath}' has {found_files} '{filename}'.")
+            print(
+                "WARN:",
+                f"'{self.zip_filepath}' has {found_files} '{filename}'.",
+                file=stderr,
+            )
         img = Image.open(self.z.open(filepaths[0]))
         return np.array(img)
 

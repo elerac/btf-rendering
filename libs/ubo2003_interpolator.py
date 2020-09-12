@@ -38,8 +38,7 @@ class BtfInterpolator:
         image_list = [None] * len(Xy)
         xyz_list   = [None] * len(Xy)
         for i, (im, angles) in enumerate(Xy):
-            # 画像はpillow形式からndarray形式に変換する．
-            img_bgr = (np.array(im)[...,::-1]).copy()
+            img_bgr = (im[...,::-1]).copy()
             image_list[i]  = img_bgr
             
             # 角度は球面座標から直交座標へ変換する．

@@ -19,5 +19,8 @@ def orthogonal2spherical(x, y, z):
     """
     r = (x**2+y**2+z**2)**0.5
     theta = np.arccos(z/r)
-    phi = np.sign(y) * np.arccos(x/(x**2+y**2)**0.5)
+    try:
+        phi = np.sign(y) * np.arccos(x/(x**2+y**2)**0.5)
+    except ZeroDivisionError:
+        phi = np.pi/2.0
     return r, theta*180.0/np.pi, phi*180.0/np.pi

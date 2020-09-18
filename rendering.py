@@ -1,4 +1,5 @@
 import os
+import argparse
 
 import mitsuba
 mitsuba.set_variant('scalar_rgb')
@@ -9,11 +10,17 @@ from mitsuba.render import register_bsdf
 from custom_bsdf.measuredbtf import MeasuredBTF
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-i", "--input", type=str, default="scenes/simple_sphere/simple_sphere.xml", help="Input scene filepath (.xml)")
+    parser.add_argument("-o", "--output", type=str, default="rendered.jpg", help="Output image filepath (.jpg, .png)")
+    args = parser.parse_args()
+
     # Register MeasuredBTF
     register_bsdf('measuredbtf', lambda props: MeasuredBTF(props))
-
-    filename_src = 'scenes/simple_sphere/simple_sphere.xml'
-    filename_dst = 'simple_sphere.jpg'
+    
+    # Filename
+    filename_src = args.input
+    filename_dst = args.output
 
     # Load an XML file
     Thread.thread().file_resolver().append(os.path.dirname(filename_src))

@@ -30,4 +30,4 @@ Download the [UBO2003](https://cg.cs.uni-bonn.de/en/projects/btfdbb/download/ubo
 ```
 
 ### Warning
-The execution of this plugin is **extremely slow**. And, It can **only be implemented in the `scalar_rgb` vriatnt**. Speeding up and supporting another variants (e.g. `gpu_rgb`) is the future work.
+The execution of this plugin is **extremely slow**. And, It can **only be implemented in the `scalar_rgb` variatnt**. Speeding up and supporting another variants (e.g. `gpu_rgb`) is the future work.

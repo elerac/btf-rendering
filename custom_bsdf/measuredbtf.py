@@ -49,17 +49,13 @@ class MeasuredBTF(BSDF):
         xo, yo, zo = wo
         _, tl, pl = orthogonal2spherical(xo, yo, zo)
         
-        # BTF画像を取得
-        img_btf = self.btf(tl, pl, tv, pv)
-        
         # 画像中の座標位置を求める
         u, v = self.m_transform.transform_point(uv)
-        height, width = img_btf.shape[:2]
-        ix = int((u*( width-1))%( width-1))
-        iy = int((v*(height-1))%(height-1))
-
-        # 画像から値を抜き出し，0.0~1.0にスケーリング
-        bgr = img_btf[iy, ix]/255.0
+        
+        # BTFの画素値を取得
+        img_btf = self.btf.angles_uv_to_pixel(tl, pl, tv, pv, u, v)
+        # 0.0~1.0にスケーリング
+        bgr = img_btf/255.0
         
         # 逆ガンマ補正をかける
         if self.m_apply_inv_gamma:

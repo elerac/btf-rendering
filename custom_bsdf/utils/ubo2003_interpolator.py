@@ -49,21 +49,34 @@ class BtfInterpolator:
         
         # 補間器を生成
         self.__values = np.array(image_list)
+        num, self.__height, self.__width, channel = self.__values.shape
         del image_list
         
         points = np.array(xyz_list)
         del xyz_list
         self.__kd_tree = cKDTree(points)
-        
-    def __call__(self, tl: float, pl: float, tv: float, pv: float):
+    
+    def __uv_to_xy(self, u, v):
+        """uv座標(float)を，BTF画像に対応するxy座標(int)に変換する
         """
-        'tl', 'pl', 'tv', 'pv'の角度の画像を補間して返す．
+        xf = np.mod(u * (self.__width-1), self.__width-1)
+        yf = np.mod(v * (self.__height-1), self.__height-1)
+        x = np.array(xf).astype(np.uint32)
+        y = np.array(yf).astype(np.uint32)
+        return x, y
+        
+    def angles_uv_to_pixel(self, tl, pl, tv, pv, u, v):
+        """
+        `tl`, `pl`, `tv`, `pv`の角度条件で`u`，`v`の座標の画像値を補間して返す．
 
         tl, pl : float
             光源の方向(tl:theta, pl:phi)
 
         tv, pv : float
             カメラの方向(tv:theta, pv:phi)
+
+        u, v : float
+            BTFの画像座標
         """ 
         # 角度は球面座標から直交座標へ変換する．
         xyz_l = spherical2orthogonal(1.0, tl, pl)
@@ -74,7 +87,8 @@ class BtfInterpolator:
         k = 4
         distance, index = self.__kd_tree.query(point, k=k)
         
-        values = self.__values[index] # (k, height, width, channel)
+        x, y = self.__uv_to_xy(u, v)
+        values = self.__values[index, y, x] # (k, height, width, channel)
         if k==1:
             img_btf = values
         else:
@@ -82,5 +96,5 @@ class BtfInterpolator:
             p = 2.0
             w = 1/(distance+1e-32)**p
             img_btf = np.average(values, axis=0, weights=w)
-        
+
         return img_btf

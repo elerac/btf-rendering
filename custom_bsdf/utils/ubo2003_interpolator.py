@@ -65,6 +65,39 @@ class BtfInterpolator:
         y = np.array(yf).astype(np.uint32)
         return x, y
         
+    def angles_xy_to_pixel(self, tl, pl, tv, pv, x, y):
+        """
+        `tl`, `pl`, `tv`, `pv`の角度条件で`x`，`y`の座標の画像値を補間して返す．
+
+        tl, pl : float
+            光源の方向(tl:theta, pl:phi)
+
+        tv, pv : float
+            カメラの方向(tv:theta, pv:phi)
+
+        x, y : float
+            BTFのxy画像座標
+        """ 
+        # 角度は球面座標から直交座標へ変換する．
+        xyz_l = spherical2orthogonal(1.0, tl, pl)
+        xyz_v = spherical2orthogonal(1.0, tv, pv)
+        point = np.array(xyz_l+xyz_v)
+        
+        # 角度に対応する画像を取得
+        k = 4
+        distance, index = self.__kd_tree.query(point, k=k)
+        
+        values = self.__values[index, y, x] # (k, height, width, channel)
+        if k==1:
+            img_btf = values
+        else:
+            # Inverse Distance Weighting interpolation
+            p = 2.0
+            w = 1/(distance+1e-32)**p
+            img_btf = np.average(values, axis=0, weights=w)
+
+        return img_btf
+    
     def angles_uv_to_pixel(self, tl, pl, tv, pv, u, v):
         """
         `tl`, `pl`, `tv`, `pv`の角度条件で`u`，`v`の座標の画像値を補間して返す．
@@ -76,25 +109,8 @@ class BtfInterpolator:
             カメラの方向(tv:theta, pv:phi)
 
         u, v : float
-            BTFの画像座標
+            BTFのuv画像座標
         """ 
-        # 角度は球面座標から直交座標へ変換する．
-        xyz_l = spherical2orthogonal(1.0, tl, pl)
-        xyz_v = spherical2orthogonal(1.0, tv, pv)
-        point = np.array(xyz_l+xyz_v)
-        
-        # 角度に対応する画像を取得
-        k = 4
-        distance, index = self.__kd_tree.query(point, k=k)
-        
         x, y = self.__uv_to_xy(u, v)
-        values = self.__values[index, y, x] # (k, height, width, channel)
-        if k==1:
-            img_btf = values
-        else:
-            # Inverse Distance Weighting interpolation
-            p = 2.0
-            w = 1/(distance+1e-32)**p
-            img_btf = np.average(values, axis=0, weights=w)
+        return self.angles_xy_to_pixel(tl, pl, tv, pv, x, y)
 
-        return img_btf

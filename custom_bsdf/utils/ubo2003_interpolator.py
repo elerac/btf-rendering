@@ -114,3 +114,16 @@ class BtfInterpolator:
         x, y = self.__uv_to_xy(u, v)
         return self.angles_xy_to_pixel(tl, pl, tv, pv, x, y)
 
+    def angles_to_image(self, tl, pl, tv, pv):
+        """
+        `tl`, `pl`, `tv`, `pv`の角度条件の画像値を補間して返す．
+
+        tl, pl : float
+            光源の方向(tl:theta, pl:phi)
+
+        tv, pv : float
+            カメラの方向(tv:theta, pv:phi)
+        """
+        x = np.arange(self.__width)
+        y = np.arange(self.__height)
+        return self.angles_xy_to_pixel(tl, pl, tv, pv, x, y)

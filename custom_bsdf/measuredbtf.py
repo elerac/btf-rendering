@@ -1,6 +1,6 @@
 import numpy as np
-from libs.ubo2003_interpolator import BtfInterpolator
-from libs.coord_system_transfer import orthogonal2spherical
+from .utils.ubo2003_interpolator import BtfInterpolator
+from .utils.coord_system_transfer import orthogonal2spherical
 
 import enoki as ek
 from mitsuba.core import Bitmap, Struct, Thread, math, Properties, Frame3f, Float, Vector3f, warp

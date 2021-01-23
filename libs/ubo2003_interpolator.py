@@ -5,7 +5,7 @@ BTFDBBを元に．任意角度のBTF画像を補間して返すためのライ�
 BTFDBBの読み込みについては，ubo2003_extractor.pyを参照．
 """
 import numpy as np
-import scipy.interpolate
+from scipy.spatial import cKDTree
 
 from .ubo2003_extractor import BtfFromZip
 from .coord_system_transfer import spherical2orthogonal
@@ -48,15 +48,13 @@ class BtfInterpolator:
         del Xy
         
         # 補間器を生成
-        points = np.array(xyz_list)
-        values = np.array(image_list)
-        del xyz_list
+        self.__values = np.array(image_list)
         del image_list
-        if linear_interp:
-            self.interpolator = scipy.interpolate.LinearNDInterpolator(points, values)
-        else:
-            self.interpolator = scipy.interpolate.NearestNDInterpolator(points, values)
-
+        
+        points = np.array(xyz_list)
+        del xyz_list
+        self.__kd_tree = cKDTree(points)
+        
     def __call__(self, tl: float, pl: float, tv: float, pv: float):
         """
         'tl', 'pl', 'tv', 'pv'の角度の画像を補間して返す．
@@ -73,6 +71,10 @@ class BtfInterpolator:
         point = np.array(xyz_l+xyz_v)
         
         # 角度に対応する画像を取得
-        img_btf = self.interpolator(point)[0]
+        k = 1
+        distance, index = self.__kd_tree.query(point, k=k)
+        
+        values = self.__values[index] # (k, height, width, channel)
+        img_btf = values
         
         return img_btf

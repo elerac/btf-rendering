@@ -71,10 +71,16 @@ class BtfInterpolator:
         point = np.array(xyz_l+xyz_v)
         
         # 角度に対応する画像を取得
-        k = 1
+        k = 4
         distance, index = self.__kd_tree.query(point, k=k)
         
         values = self.__values[index] # (k, height, width, channel)
-        img_btf = values
+        if k==1:
+            img_btf = values
+        else:
+            # Inverse Distance Weighting interpolation
+            p = 2.0
+            w = 1/(distance+1e-32)**p
+            img_btf = np.average(values, axis=0, weights=w)
         
         return img_btf

@@ -59,8 +59,8 @@ class BtfInterpolator:
     def __uv_to_xy(self, u, v):
         """uv座標(float)を，BTF画像に対応するxy座標(int)に変換する
         """
-        xf = np.mod(u * (self.__width-1), self.__width-1)
-        yf = np.mod(v * (self.__height-1), self.__height-1)
+        xf = np.mod(u * (self.__width-1), self.__width)
+        yf = np.mod(v * (self.__height-1), self.__height)
         x = np.array(xf).astype(np.uint32)
         y = np.array(yf).astype(np.uint32)
         return x, y

@@ -42,26 +42,25 @@ class MeasuredBTF(BSDF):
             UV surface coordinates
         """
         # カメラ側の方向
-        xi, yi, zi = wi
-        _, tv, pv = orthogonal2spherical(xi, yi, zi)
+        _, tv, pv = orthogonal2spherical(*wi)
         
         # 光源側の方向
-        xo, yo, zo = wo
-        _, tl, pl = orthogonal2spherical(xo, yo, zo)
+        _, tl, pl = orthogonal2spherical(*wo)
         
         # 画像中の座標位置を求める
         u, v = self.m_transform.transform_point(uv)
         
         # BTFの画素値を取得
-        img_btf = self.btf.angles_uv_to_pixel(tl, pl, tv, pv, u, v)
+        bgr = self.btf.angles_uv_to_pixel(tl, pl, tv, pv, u, v)
+        
         # 0.0~1.0にスケーリング
-        bgr = img_btf/255.0
+        bgr /= 255.0
         
         # 逆ガンマ補正をかける
         if self.m_apply_inv_gamma:
             bgr **= 2.2
 
-        return Vector3f(bgr[2], bgr[1], bgr[0])
+        return Vector3f(bgr[..., ::-1])
 
     def sample(self, ctx, si, sample1, sample2, active):
         """

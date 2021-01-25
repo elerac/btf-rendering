@@ -54,7 +54,7 @@ class MeasuredBTF(BSDF):
         bgr = self.btf.angles_uv_to_pixel(tl, pl, tv, pv, u, v)
         
         # 0.0~1.0にスケーリング
-        bgr /= 255.0
+        bgr = bgr / 255.0
         
         # 逆ガンマ補正をかける
         if self.m_apply_inv_gamma:

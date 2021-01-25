@@ -3,7 +3,7 @@ from .utils.ubo2003_interpolator import BtfInterpolator
 from .utils.coord_system_transfer import orthogonal2spherical
 
 import enoki as ek
-from mitsuba.core import Bitmap, Struct, Thread, math, Properties, Frame3f, Float, Vector3f, warp
+from mitsuba.core import Bitmap, Struct, Thread, math, Properties, Frame3f, Float, Vector3f, warp, Transform3f
 from mitsuba.render import BSDF, BSDFContext, BSDFFlags, BSDFSample3f, SurfaceInteraction3f, register_bsdf, Texture
 
 class MeasuredBTF(BSDF):
@@ -20,7 +20,7 @@ class MeasuredBTF(BSDF):
             self.m_apply_inv_gamma = True
 
         # UVマップの変換
-        self.m_transform = props["to_uv"].extract()
+        self.m_transform = Transform3f(props["to_uv"].extract())
         
         # 読み込んだBTF
         self.btf = BtfInterpolator(self.m_filename)

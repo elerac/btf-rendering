@@ -53,15 +53,14 @@ class BtfInterpolator:
         # すべてのファイルの実態と角度情報を読み込みリストを生成
         image_list = []
         point_list   = []
-        for filepath in btf_extractor.get_filepath_set():
+        for tl, pl, tv, pv in list(btf_extractor.angles_set):
             # 画像と角度を読み込み
-            img_rgb, angles = btf_extractor.filepath_to_X_y(filepath)
+            img_rgb = btf_extractor.angles_to_image(tl, pl, tv, pv)
             
             # 画像をRGBからBGRに変換
             img_bgr = img_rgb[...,::-1].copy()
             
             # 角度を球面座標から直交座標へ変換
-            tl, pl, tv, pv = angles
             xl, yl, zl = spherical2orthogonal(1.0, tl, pl)
             xv, yv, zv = spherical2orthogonal(1.0, tv, pv)
             point = np.array([xl, yl, zl, xv, yv, zv])

@@ -25,6 +25,7 @@ class BtfFromZip:
         self.zip_filepath = zip_filepath
         self.z = ZipFile(zip_filepath)
         self.filepath_set = self.get_filepath_set()
+        self.angles_set = frozenset(self.get_angles_set())
 
     def get_filepath_set(self) -> Set[str]:
         """zip内の"jpg"ファイルのファイルパスの集合を取得する"""

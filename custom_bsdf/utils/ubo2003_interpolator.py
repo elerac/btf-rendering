@@ -75,6 +75,7 @@ class BtfInterpolator:
 
         # 画像のサイズを取得
         num, height, width, channel = self.__images.shape
+        self.__num = num
         self.__height = height
         self.__width = width
         
@@ -114,22 +115,25 @@ class BtfInterpolator:
         # 角度は球面座標から直交座標へ変換する．
         xl, yl, zl = spherical2orthogonal(1.0, tl, pl)
         xv, yv, zv = spherical2orthogonal(1.0, tv, pv)
-        point = np.array([xl, yl, zl, xv, yv, zv])
+        point = np.array([xl, yl, zl, xv, yv, zv]).T
         
         # k近傍探索を実行
         # 距離はl2ノルム
         distance, index = self.__kd_tree.query(point, k=self.k, p=2)
         
         # 対応する角度・xy座標のBTF画像の値を取得
-        btf_values = self.__images[index, y, x] # (k, height, width, channel)
+        index = np.clip(index, 0, self.__num-1)
+        x = np.expand_dims(np.clip(x, 0, self.__width-1), axis=-1)
+        y = np.expand_dims(np.clip(y, 0, self.__height-1), axis=-1)
+        btf_values = self.__images[index, y, x]
         
         if self.k==1:
             # 補間なし
             pixel = btf_values
         else:
             # 逆距離加重法による補間
-            weights = 1/(distance+1e-32)**self.p
-            pixel = np.average(btf_values, axis=0, weights=weights)
+            weights = np.expand_dims( 1/(distance+10**-32)**self.p, axis=-1)
+            pixel = np.sum(btf_values * weights, axis=-2) / np.sum(weights, axis=-2)
 
         return pixel
     

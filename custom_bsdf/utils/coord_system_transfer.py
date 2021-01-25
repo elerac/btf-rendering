@@ -5,8 +5,8 @@ def spherical2orthogonal(r, theta, phi):
     球面座標から直交座標へ変換する．
     thetaとphiの単位は度．
     """
-    theta = theta*np.pi/180.0
-    phi = phi*np.pi/180.0
+    theta = np.deg2rad(theta)
+    phi = np.deg2rad(phi)
     x = r * np.sin(theta) * np.cos(phi)
     y = r * np.sin(theta) * np.sin(phi)
     z = r * np.cos(theta)
@@ -17,10 +17,8 @@ def orthogonal2spherical(x, y, z):
     直交座標から球面座標へ変換する．
     thetaとphiの単位は度．
     """
-    r = (x**2+y**2+z**2)**0.5
+    r = np.sqrt(x*x+y*y+z*z)
     theta = np.arccos(z/r)
-    try:
-        phi = np.sign(y) * np.arccos(x/(x**2+y**2)**0.5)
-    except ZeroDivisionError:
-        phi = np.pi/2.0
-    return r, theta*180.0/np.pi, phi*180.0/np.pi
+    x_for_arccos = x / (np.sqrt(x*x+y*y) + 10**-32)
+    phi = np.sign(y) * np.arccos( np.clip(x_for_arccos, -1, 1) )
+    return r, np.rad2deg(theta), np.rad2deg(phi)

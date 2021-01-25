@@ -119,7 +119,7 @@ class BtfInterpolator:
         
         # k近傍探索を実行
         # 距離はl2ノルム
-        distance, index = self.__kd_tree.query(point, k=self.k, p=2)
+        distance, index = self.__kd_tree.query(point, k=self.k, p=2, workers=-1)
         
         # 対応する角度・xy座標のBTF画像の値を取得
         index = np.clip(index, 0, self.__num-1)

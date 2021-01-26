@@ -3,6 +3,7 @@ import argparse
 
 import mitsuba
 mitsuba.set_variant('scalar_rgb')
+#mitsuba.set_variant('gpu_rgb')
 from mitsuba.core import Bitmap, Struct, Thread
 from mitsuba.core.xml import load_file
 from mitsuba.render import register_bsdf

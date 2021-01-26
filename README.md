@@ -1,13 +1,37 @@
 # BTF Rendering
-Custom plugin in Python to render measured BTF (Bidirectional Texture Function)  with [Mitsuba 2](https://github.com/mitsuba-renderer/mitsuba2).
+Custom plugin in Python to render measured BTF (Bidirectional Texture Function)  with Mitsuba 2.
 
 ![](documents/cloth_wool.jpg)
+
+## Usage
+1. Clone and compile [Mitsuba 2](https://github.com/mitsuba-renderer/mitsuba2). Check whether you can `import mitsuba` in python.
+2. Clone this repository and move it there.
+```bash
+git clone https://github.com/elerac/btf-rendering.git
+cd btf-rendering
+```
+3. Download [UBO2003 BTF Dataset](https://cg.cs.uni-bonn.de/en/projects/btfdbb/download/ubo2003/). Make directory named `UBO2003/` and save the data under there. OR, you can run [download_large_data.py](https://github.com/elerac/btf-rendering/blob/master/download_large_data.py) and the data will download automatically.  
+Have you placed BTF Dataset as shown below?
+```
+.
+├── UBO2003
+│   ├── UBO_IMPALLA256.zip
+│   ├── ...
+├── custom_bsdf
+├── download_large_data.py
+├── rendering.py
+├── scenes
+├── ...
+```
+4. Run [rendering.py](https://github.com/elerac/btf-rendering/blob/master/rendering.py) and get [rendered image using BTF](https://github.com/elerac/btf-rendering/blob/master/documents/simple_sphere.jpg).
 
 ## Measured BTF (*measuredbtf*)
 | Parameter | Type | Description | 
 | :-- | :-- | :-- |
 | filename | string | Filename of the ZIP file to be loaded. |
+| reflectance| rgb | Adjust the reflectance of the BTF. (Default: 1.0) |
 | apply_inv_gamma | boolean | Whether to apply inverse gamma correction. If the input is the gamma-corrected image, this process should be applied. (Default: *true*) | 
+| power_parameter | float | Determine the smoothness of the interpolation. The smaller the value, the smoother it is. (Default: 2.0) |
 | to_uv | transform | Specifies an optional 3x3 UV transformation matrix. A 4x4 matrix can also be provided, in which case the extra row and column are ignored. (Default: none) |
 
 | | | 
@@ -30,4 +54,4 @@ Download the [UBO2003](https://cg.cs.uni-bonn.de/en/projects/btfdbb/download/ubo
 ```
 
 ### Warning
-The execution of this plugin is **extremely slow**. And, It can **only be implemented in the `scalar_rgb` variatnt**. Speeding up and supporting another variants (e.g. `gpu_rgb`) is the future work.
+In the `scalar_rgb` variant, the execution of this plugin is **extremely slow**. Thus, using the `gpu_rgb` variant is recommended.

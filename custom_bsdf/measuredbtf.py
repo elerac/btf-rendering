@@ -19,11 +19,24 @@ class MeasuredBTF(BSDF):
         else:
             self.m_apply_inv_gamma = True
 
+        # 反射率
+        if props.has_property("reflectance"):
+            si = SurfaceInteraction3f()
+            self.m_reflectance = Vector3f(props["reflectance"].eval(si))
+        else:
+            self.m_reflectance = Vector3f(1.0)
+
+        # Power parameter
+        if props.has_property("power_parameter"):
+            self.m_power_parameter = float(props["power_parameter"])
+        else:
+            self.m_power_parameter = 2.0
+
         # UVマップの変換
         self.m_transform = Transform3f(props["to_uv"].extract())
         
         # 読み込んだBTF
-        self.btf = BtfInterpolator(self.m_filename)
+        self.btf = BtfInterpolator(self.m_filename, p=self.m_power_parameter)
         
         self.m_flags = BSDFFlags.DiffuseReflection | BSDFFlags.FrontSide
         self.m_components = [self.m_flags]
@@ -54,7 +67,7 @@ class MeasuredBTF(BSDF):
         bgr = self.btf.angles_uv_to_pixel(tl, pl, tv, pv, u, v)
         
         # 0.0~1.0にスケーリング
-        bgr = bgr / 255.0
+        bgr = np.clip(bgr / 255.0 * self.m_reflectance, 0, 1)
         
         # 逆ガンマ補正をかける
         if self.m_apply_inv_gamma:

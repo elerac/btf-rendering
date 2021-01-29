@@ -53,5 +53,16 @@ Download the [UBO2003](https://cg.cs.uni-bonn.de/en/projects/btfdbb/download/ubo
 </bsdf>
 ```
 
-### Warning
+### Interpolation and Power Parameter
+This custom plugin interpolates BTF. The interpolation is done by [k-nearest neighbor sampling](https://en.wikipedia.org/wiki/K-nearest_neighbors_algorithm) and [inverse distance weighting](https://en.wikipedia.org/wiki/Inverse_distance_weighting).
+The weight of the inverse distance weighting can be adjusted by the power parameter *p*. The parameter *p* determines the influence of the distance between the interpolation points. The smaller *p* is, the smoother the interpolation will be.
+
+The following figures show the difference in appearance when *p* is changed. When *p* is small (*p*=1), the texture is smooth and specular reflection is weak. On the other hand, when *p* is large (*p*=32), the texture has discontinuous boundaries. This is because the angle of the captured BTF data is sparse.
+| | | | | 
+| :-: | :-: | :-: | :-: |
+| ![](documents/simple_sphere_p1.jpg) | ![](documents/simple_sphere_p2.jpg) | ![](documents/simple_sphere_p4.jpg) | ![](documents/simple_sphere_p32.jpg) |
+| *p* = 1 | *p* = 2 | *p* = 4 | *p* = 32 |
+
+
+## Warning
 In the `scalar_rgb` variant, the execution of this plugin is **extremely slow**. Thus, using the `gpu_rgb` variant is recommended.

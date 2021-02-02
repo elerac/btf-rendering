@@ -21,10 +21,9 @@ class MeasuredBTF(BSDF):
 
         # 反射率
         if props.has_property("reflectance"):
-            si = SurfaceInteraction3f()
-            self.m_reflectance = Vector3f(props["reflectance"].eval(si))
+            self.m_reflectance = Float(props["reflectance"])
         else:
-            self.m_reflectance = Vector3f(1.0)
+            self.m_reflectance = Float(1.0)
 
         # Power parameter
         if props.has_property("power_parameter"):

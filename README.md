@@ -4,6 +4,8 @@ Custom plugin in Python to render measured BTF (Bidirectional Texture Function) 
 ![](documents/cloth_wool.jpg)
 
 ## Usage
+0. Make sure that the following libraries are available in python.
+- SciPy
 1. Clone and compile [Mitsuba 2](https://github.com/mitsuba-renderer/mitsuba2). Check whether you can `import mitsuba` in python.
 2. Clone this repository and move it there.
 ```bash

@@ -2,28 +2,31 @@
 BTFDBBを元に．任意角度のBTF画像を補間して返すためのライブラリ．
 任意の角度(tl, pl, tv, pv)から，補間したndarray形式の画像を取得．
 
-BTFDBBの読み込みについては，ubo2003_extractor.pyを参照．
+BTFDBBの読み込みについては，btf-extractor(https://github.com/2-propanol/BTF_extractor)を参照．
 """
+import os
 import numpy as np
 from scipy.spatial import cKDTree
-
-from .ubo2003_extractor import BtfFromZip
+from btf_extractor import Ubo2003, Ubo2014
 from .coord_system_transfer import spherical2orthogonal
+
 
 class BtfInterpolator:
     """
     BTFDBBを元に，任意角度のBTF画像を補間して返す．
     補間は，k近傍のデータから，逆距離加重法(Inverse Distance Weighting)を用いている．
     """
-    def __init__(self, zip_filepath, k=4, p=2.0):
+    def __init__(self, filepath, k=4, p=2.0):
         """
         BTFDBBを読み込み，補間器を生成する．
         （読み込みには少し時間がかかります）
         
         Parameters
         ----------
-        zip_filepath : str
-            BTFDBBのzipファイルのパス
+        filepath : str
+            BTFDBBのファイルのパス
+            拡張子が".zip"の場合は"Ubo2003"
+            拡張子が".btf"の場合は"Ubo2014"
         k : int
             補間に用いる近傍点の数
         p : float
@@ -47,18 +50,21 @@ class BtfInterpolator:
         self.k = k
         self.p = p
         
-        # zipファイルからのBTFDBBの読み込み
-        btf_extractor = BtfFromZip(zip_filepath)
+        # BTFDBBの読み込み
+        root, ext = os.path.splitext(filepath)
+        if ext==".zip":
+            btf_extractor = Ubo2003(filepath)
+        elif ext==".btf":
+            btf_extractor = Ubo2014(filepath)
+        else:
+            raise Exception("The filepath must have a .zip or .btf extension.")
         
         # すべてのファイルの実態と角度情報を読み込みリストを生成
         image_list = []
         point_list   = []
         for tl, pl, tv, pv in list(btf_extractor.angles_set):
             # 画像と角度を読み込み
-            img_rgb = btf_extractor.angles_to_image(tl, pl, tv, pv)
-            
-            # 画像をRGBからBGRに変換
-            img_bgr = img_rgb[...,::-1].copy()
+            img_bgr = btf_extractor.angles_to_image(tl, pl, tv, pv)
             
             # 角度を球面座標から直交座標へ変換
             xl, yl, zl = spherical2orthogonal(1.0, tl, pl)

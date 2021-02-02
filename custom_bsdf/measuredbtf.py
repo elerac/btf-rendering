@@ -1,5 +1,5 @@
 import numpy as np
-from .utils.ubo2003_interpolator import BtfInterpolator
+from .utils.btf_interpolator import BtfInterpolator
 from .utils.coord_system_transfer import orthogonal2spherical
 
 import enoki as ek

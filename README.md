@@ -30,7 +30,7 @@ Have you placed BTF Dataset as shown below?
 ## Measured BTF (*measuredbtf*)
 | Parameter | Type | Description | 
 | :-- | :-- | :-- |
-| filename | string | Filename of the ZIP file to be loaded. |
+| filename | string | Filename of the BTF database file to be loaded. The type of dataset is distinguished by its extension. .zip for UBO2003, .btf for UBO2014.|
 | reflectance| rgb | Adjust the reflectance of the BTF. (Default: 1.0) |
 | apply_inv_gamma | boolean | Whether to apply inverse gamma correction. If the input is the gamma-corrected image, this process should be applied. (Default: *true*) | 
 | power_parameter | float | Determine the smoothness of the interpolation. The smaller the value, the smoother it is. (Default: 2.0) |
@@ -43,11 +43,12 @@ Have you placed BTF Dataset as shown below?
 
 This custom plugin implements a BTF for rendering reflections of textures taken in a real scene. The BTF is a set of images with different illumination and viewing directions.
 
-`filename` is the name of the image zip file. This zip file should follow the format of the BTF dataset of University of Bonn. It is a set of image files with the naming composition like *WoolPKNT256_00084_tl015_pl000_tv015_pv120.jpg*.
-Download the [UBO2003](https://cg.cs.uni-bonn.de/en/projects/btfdbb/download/ubo2003/) or [ATRIUM](https://cg.cs.uni-bonn.de/en/projects/btfdbb/download/atrium/) dataset for rendering.
+`filename` is the name of the BTF database file. This file should follow the format of the BTF dataset of University of Bonn.
+Download the [UBO2003](https://cg.cs.uni-bonn.de/en/projects/btfdbb/download/ubo2003/) or [ATRIUM](https://cg.cs.uni-bonn.de/en/projects/btfdbb/download/atrium/) or [UBO2014](https://cg.cs.uni-bonn.de/en/projects/btfdbb/download/ubo2014/) dataset for rendering.
 
 ```xml
 <bsdf type="measuredbtf">
+    <!-- UBO2003 case -->
     <string name="filename" value="UBO_IMPALLA256.zip"/>
     <transform name="to_uv">
         <scale value="5"/>

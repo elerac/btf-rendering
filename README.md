@@ -3,9 +3,12 @@ Custom plugin in Python to render measured BTF (Bidirectional Texture Function) 
 
 ![](documents/cloth_wool.jpg)
 
-## Usage
-0. Make sure that the following libraries are available in python.
-- SciPy
+## Requirement in Python
+Make sure that the following libraries are available in python.
+- [SciPy](https://www.scipy.org/)
+- [BTF Extractor](https://github.com/2-propanol/BTF_extractor)
+
+## Usage 
 1. Clone and compile [Mitsuba 2](https://github.com/mitsuba-renderer/mitsuba2). Check whether you can `import mitsuba` in python.
 2. Clone this repository and move it there.
 ```bash
@@ -58,7 +61,7 @@ Download the [UBO2003](https://cg.cs.uni-bonn.de/en/projects/btfdbb/download/ubo
 
 ### Interpolation and Power Parameter
 This custom plugin interpolates BTF. The interpolation is done by [k-nearest neighbor sampling](https://en.wikipedia.org/wiki/K-nearest_neighbors_algorithm) and [inverse distance weighting](https://en.wikipedia.org/wiki/Inverse_distance_weighting).
-The weight of the inverse distance weighting can be adjusted by the power parameter *p*. The parameter *p* determines the influence of the distance between the interpolation points. The smaller *p* is, the smoother the interpolation will be.
+The weight of the inverse distance weighting can be adjusted by the `power_parameter` *p*. The parameter *p* determines the influence of the distance between the interpolation points. The smaller *p* is, the smoother the interpolation will be.
 
 The following figures show the difference in appearance when *p* is changed. When *p* is small (*p*=1), the texture is smooth and specular reflection is weak. On the other hand, when *p* is large (*p*=32), the texture has discontinuous boundaries. This is because the angle of the captured BTF data is sparse.
 | | | | | 

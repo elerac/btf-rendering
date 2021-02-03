@@ -37,6 +37,7 @@ Have you placed BTF Dataset as shown below?
 | reflectance| float | Adjust the reflectance of the BTF. (Default: 1.0) |
 | apply_inv_gamma | boolean | Whether to apply inverse gamma correction. If the input is the gamma-corrected image, this process should be applied. (Default: *true*) | 
 | power_parameter | float | Determine the smoothness of the interpolation. The smaller the value, the smoother it is. (Default: 4.0) |
+| wrap_mode | string | Controls the behavior of texture evaluations that fall outside of the [0,1] range. The `repeat` and `mirror` options are currently available. (Default: `repeat`)|
 | to_uv | transform | Specifies an optional 3x3 UV transformation matrix. A 4x4 matrix can also be provided, in which case the extra row and column are ignored. (Default: none) |
 
 | | | 

@@ -1,6 +1,6 @@
 import numpy as np
 from .utils.btf_interpolator import BtfInterpolator
-from .utils.coord_system_transfer import orthogonal2spherical
+from .utils.coord_system_transfer import orthogonal2spherical, mirror_uv
 
 import enoki as ek
 from mitsuba.core import Bitmap, Struct, Thread, math, Properties, Frame3f, Float, Vector3f, warp, Transform3f
@@ -31,6 +31,12 @@ class MeasuredBTF(BSDF):
         else:
             self.m_power_parameter = Float(4.0)
 
+        # Wrap mode
+        if props.has_property("wrap_mode"):
+            self.m_wrap_mode = str(props["wrap_mode"])
+        else:
+            self.m_wrap_mode = "repeat"
+
         # UVマップの変換
         self.m_transform = Transform3f(props["to_uv"].extract())
         
@@ -60,7 +66,13 @@ class MeasuredBTF(BSDF):
         _, tl, pl = orthogonal2spherical(*wo)
         
         # 画像中の座標位置を求める
-        u, v = self.m_transform.transform_point(uv)
+        uv = self.m_transform.transform_point(uv)
+
+        # warp_modeがmirrorなら座標の変換
+        if self.m_wrap_mode == "mirror":
+            uv = mirror_uv(uv).T
+
+        u, v = uv
         
         # BTFの画素値を取得
         bgr = self.btf.angles_uv_to_pixel(tl, pl, tv, pv, u, v)

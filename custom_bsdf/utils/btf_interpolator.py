@@ -53,18 +53,18 @@ class BtfInterpolator:
         # BTFDBBの読み込み
         root, ext = os.path.splitext(filepath)
         if ext==".zip":
-            btf_extractor = Ubo2003(filepath)
+            btf = Ubo2003(filepath)
         elif ext==".btf":
-            btf_extractor = Ubo2014(filepath)
+            btf = Ubo2014(filepath)
         else:
             raise Exception("The filepath must have a .zip or .btf extension.")
         
         # すべてのファイルの実態と角度情報を読み込みリストを生成
         image_list = []
         point_list   = []
-        for tl, pl, tv, pv in list(btf_extractor.angles_set):
+        for tl, pl, tv, pv in list(btf.angles_set):
             # 画像と角度を読み込み
-            img_bgr = btf_extractor.angles_to_image(tl, pl, tv, pv)
+            img_bgr = btf.angles_to_image(tl, pl, tv, pv)
             
             # 角度を球面座標から直交座標へ変換
             xl, yl, zl = spherical2orthogonal(1.0, tl, pl)

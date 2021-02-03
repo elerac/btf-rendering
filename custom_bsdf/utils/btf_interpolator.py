@@ -16,7 +16,7 @@ class BtfInterpolator:
     BTFDBBを元に，任意角度のBTF画像を補間して返す．
     補間は，k近傍のデータから，逆距離加重法(Inverse Distance Weighting)を用いている．
     """
-    def __init__(self, filepath, k=4, p=2.0):
+    def __init__(self, filepath, k=4, p=4.0):
         """
         BTFDBBを読み込み，補間器を生成する．
         （読み込みには少し時間がかかります）

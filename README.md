@@ -36,7 +36,7 @@ Have you placed BTF Dataset as shown below?
 | filename | string | Filename of the BTF database file to be loaded. The type of dataset is distinguished by its extension. .zip for UBO2003, .btf for UBO2014.|
 | reflectance| float | Adjust the reflectance of the BTF. (Default: 1.0) |
 | apply_inv_gamma | boolean | Whether to apply inverse gamma correction. If the input is the gamma-corrected image, this process should be applied. (Default: *true*) | 
-| power_parameter | float | Determine the smoothness of the interpolation. The smaller the value, the smoother it is. (Default: 2.0) |
+| power_parameter | float | Determine the smoothness of the interpolation. The smaller the value, the smoother it is. (Default: 4.0) |
 | to_uv | transform | Specifies an optional 3x3 UV transformation matrix. A 4x4 matrix can also be provided, in which case the extra row and column are ignored. (Default: none) |
 
 | | | 

@@ -27,9 +27,9 @@ class MeasuredBTF(BSDF):
 
         # Power parameter
         if props.has_property("power_parameter"):
-            self.m_power_parameter = float(props["power_parameter"])
+            self.m_power_parameter = Float(props["power_parameter"])
         else:
-            self.m_power_parameter = 2.0
+            self.m_power_parameter = Float(4.0)
 
         # UVマップの変換
         self.m_transform = Transform3f(props["to_uv"].extract())

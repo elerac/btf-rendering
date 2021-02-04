@@ -42,8 +42,8 @@ Have you placed BTF Dataset as shown below?
 
 | | | 
 | :-: | :-: |
-| ![](documents/matpreview_impalla.jpg)| ![](documents/matpreview_corduroy.jpg) |
-| UBO2003 IMPALLA | UBO2003 CORDUROY |
+| ![](documents/matpreview_impalla.jpg)| ![](documents/matpreview_leather09.jpg) |
+| UBO2003 IMPALLA | UBO2014 leather09 |
 
 This custom plugin implements a BTF for rendering reflections of textures taken in a real scene. The BTF is a set of images with different illumination and viewing directions.
 

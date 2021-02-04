@@ -59,10 +59,20 @@ class BtfInterpolator:
         else:
             raise Exception("The filepath must have a .zip or .btf extension.")
         
+        # 画像のサイズを取得
+        angles_list = list(btf.angles_set)
+        num = len(angles_list)
+        img_dummy = btf.angles_to_image(*angles_list[0])
+        height, width, channel = img_dummy.shape
+        dtype = img_dummy.dtype
+        self.__num = num
+        self.__height = height
+        self.__width = width
+
         # すべてのファイルの実態と角度情報を読み込みリストを生成
-        image_list = []
-        point_list   = []
-        for tl, pl, tv, pv in list(btf.angles_set):
+        self.__images = np.empty((num, height, width, channel), dtype=dtype)
+        points = np.empty((num, 6), dtype=np.float32)
+        for i, (tl, pl, tv, pv) in enumerate(angles_list):
             # 画像と角度を読み込み
             img_bgr = btf.angles_to_image(tl, pl, tv, pv)
             
@@ -72,23 +82,11 @@ class BtfInterpolator:
             point = np.array([xl, yl, zl, xv, yv, zv])
             
             # 画像と角度をリストに保存
-            image_list.append(img_bgr)
-            point_list.append(point)
-        
-        # BTF全画像
-        self.__images = np.array(image_list)
-
-        # 画像のサイズを取得
-        num, height, width, channel = self.__images.shape
-        self.__num = num
-        self.__height = height
-        self.__width = width
+            self.__images[i] = img_bgr
+            points[i] = point
         
         # 角度の情報からKDTreeを構築
-        points = np.array(point_list)
         self.__kd_tree = cKDTree(points)
-        
-        del image_list, point_list
     
     def __uv_to_xy(self, u, v):
         """uv座標(float)を，BTF画像に対応するxy座標(int)に変換する

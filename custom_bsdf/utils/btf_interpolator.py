@@ -56,6 +56,10 @@ class BtfInterpolator:
             btf = Ubo2003(filepath)
         elif ext==".btf":
             btf = Ubo2014(filepath)
+        elif ext==".npz":
+            # https://github.com/2-propanol/btfnpz_helper
+            from btfnpz import Btfnpz
+            btf = Btfnpz(filepath)
         else:
             raise Exception("The filepath must have a .zip or .btf extension.")
         

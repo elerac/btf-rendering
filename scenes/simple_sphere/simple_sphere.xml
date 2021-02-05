@@ -43,7 +43,7 @@
 		<bsdf type="diffuse">
 			<texture name="reflectance" type="checkerboard">
 				<transform name="to_uv">
-					<scale value="2"/>
+					<scale value="5"/>
 				</transform>
 			</texture>
 		</bsdf>

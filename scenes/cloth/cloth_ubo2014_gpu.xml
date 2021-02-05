@@ -1,0 +1,46 @@
+<scene version="2.0.0">
+	<integrator type="path">
+			<integer name="samples_per_pass" value="4"/>
+	</integrator>
+
+	<sensor type="perspective">
+		<sampler type="independent">
+			<integer name="sample_count" value="400"/>
+		</sampler>
+
+		<transform name="to_world">
+			<lookat origin="5.3, 3, 5.6" target="0, 0.2, 1.2" up="0, 1, 0"/>
+		</transform>
+		
+		<film type="hdrfilm">
+			<integer name="width"  value="960"/>
+			<integer name="height" value="540"/>
+		</film>
+	</sensor>
+	
+	<emitter type="envmap">
+		<string name="filename" value="skylit_garage_1k.hdr"/>
+	</emitter>
+	
+	<shape type="obj">
+		<string name="filename" value="cloth.obj"/>
+		
+		<bsdf type="twosided">
+			<bsdf type="measuredbtf">
+				<string name="filename" value="UBO2014/fabric12_W400xH400_L151xV151.btf"/>
+				<float name="reflectance" value="450.0"/>
+				<transform name="to_uv">
+                	<scale value="5"/>
+            	</transform>
+			</bsdf>
+		</bsdf>
+	</shape>
+
+	<shape type="rectangle">
+		<transform name="to_world">
+			<rotate  x="1" angle="-90"/>
+        	<scale value="5"/>
+		</transform>
+	</shape>
+
+</scene>

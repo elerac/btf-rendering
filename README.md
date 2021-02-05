@@ -28,7 +28,7 @@ Have you placed BTF Dataset as shown below?
 ├── scenes
 ├── ...
 ```
-4. Run [rendering.py](https://github.com/elerac/btf-rendering/blob/master/rendering.py) and get [rendered image using BTF](https://github.com/elerac/btf-rendering/blob/master/documents/simple_sphere.jpg).
+4. Run [rendering.py](https://github.com/elerac/btf-rendering/blob/master/rendering.py) and get [rendered image using BTF](https://github.com/elerac/btf-rendering/blob/master/documents/simple_sphere_impalla.jpg).
 
 ## Measured BTF (*measuredbtf*)
 | Parameter | Type | Description | 

@@ -83,7 +83,7 @@ class BtfInterpolator:
             # 角度を球面座標から直交座標へ変換
             xl, yl, zl = spherical2orthogonal(1.0, tl, pl)
             xv, yv, zv = spherical2orthogonal(1.0, tv, pv)
-            point = np.array([xl, yl, zl, xv, yv, zv])
+            point = np.array([xl, yl, zl, xv, yv, zv], dtype=np.float32)
             
             # 画像と角度をリストに保存
             self.__images[i] = img_bgr
@@ -97,8 +97,8 @@ class BtfInterpolator:
         """
         xf = np.mod(u * (self.__width-1), self.__width)
         yf = np.mod(v * (self.__height-1), self.__height)
-        x = np.array(xf).astype(np.uint32)
-        y = np.array(yf).astype(np.uint32)
+        x = np.array(xf, dtype=np.uint16)
+        y = np.array(yf, dtype=np.uint16)
         return x, y
         
     def angles_xy_to_pixel(self, tl, pl, tv, pv, x, y):
@@ -122,7 +122,7 @@ class BtfInterpolator:
         # 角度は球面座標から直交座標へ変換する．
         xl, yl, zl = spherical2orthogonal(1.0, tl, pl)
         xv, yv, zv = spherical2orthogonal(1.0, tv, pv)
-        point = np.array([xl, yl, zl, xv, yv, zv]).T
+        point = np.array([xl, yl, zl, xv, yv, zv], dtype=np.float32).T
         
         # k近傍探索を実行
         # 距離はl2ノルム

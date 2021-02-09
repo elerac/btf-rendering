@@ -7,6 +7,7 @@ Custom plugin in Python to render measured BTF (Bidirectional Texture Function) 
 Make sure that the following libraries are available in python.
 - [SciPy](https://www.scipy.org/)
 - [BTF Extractor](https://github.com/2-propanol/BTF_extractor)
+- [tqdm](https://github.com/tqdm/tqdm) (optional)
 
 ## Usage 
 1. Clone and compile [Mitsuba 2](https://github.com/mitsuba-renderer/mitsuba2). Check whether you can `import mitsuba` in python.

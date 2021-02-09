@@ -5,11 +5,18 @@ BTFDBBを元に．任意角度のBTF画像を補間して返すためのライ�
 BTFDBBの読み込みについては，btf-extractor(https://github.com/2-propanol/BTF_extractor)を参照．
 """
 import os
+import datetime
 import numpy as np
 from scipy.spatial import cKDTree
 from btf_extractor import Ubo2003, Ubo2014
 from .coord_system_transfer import spherical2orthogonal
 
+# import tqdm if available
+import importlib
+tqdm_spec = importlib.util.find_spec("tqdm")
+use_tqdm = tqdm_spec is not None
+if use_tqdm:
+    from tqdm import tqdm
 
 class BtfInterpolator:
     """
@@ -76,7 +83,15 @@ class BtfInterpolator:
         # すべてのファイルの実態と角度情報を読み込みリストを生成
         self.__images = np.empty((num, height, width, channel), dtype=dtype)
         points = np.empty((num, 6), dtype=np.float32)
-        for i, (tl, pl, tv, pv) in enumerate(angles_list):
+        
+        time_now = (datetime.datetime.now()).strftime('%Y-%m-%d %H:%M:%S')
+        print(f"{time_now} INFO        [MeasuredBTF] Loading BTF dataset \"{filepath}\" ..")
+        if use_tqdm:
+            angles_iterable = tqdm(angles_list)
+        else:
+            angles_iterable = angles_list
+        
+        for i, (tl, pl, tv, pv) in enumerate(angles_iterable):
             # 画像と角度を読み込み
             img_bgr = btf.angles_to_image(tl, pl, tv, pv)
             

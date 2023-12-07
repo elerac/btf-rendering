@@ -74,3 +74,15 @@ The following figures show the difference in appearance when *p* is changed. Whe
 
 ## Warning
 In the `scalar_rgb` variant, the execution of this plugin is **extremely slow**. Thus, using the `gpu_rgb` variant is recommended.
+
+## Rendered Images from Other Papers
+
+I collected the rendered images from other papers that employ the 3D model of cloth originated at this repository ([`scenes/cloth/cloth.obj`](scenes/cloth/)). These beautifully rendered images demonstrate the effectiveness of their excellent proposed methods for BTF data processing.
+
+![Rendered image borrowed from Fig.1](documents/kavoosighafi2023.jpg)
+*Kavoosighafi et al., "SparseBTF: Sparse Representation Learning for Bidirectional Texture Functions", Eurographics Symposium on Rendering, 2023. [[Link]](https://diglib.eg.org/handle/10.2312/sr20231123)*
+
+![Rendered image borrowed from Fig.10](documents/dou2023.jpg)
+*Dou et al., "Real-Time Neural BRDF with Spherically Distributed Primitives", arXiv, 2023. [[Link]](https://arxiv.org/abs/2310.08332)*
+
+You are free to use my 3D model and scene file of cloth (and also my code) for academic purposes. If you use them, it is not necessary, but I would appreciate it if you refer to my name or this repository.

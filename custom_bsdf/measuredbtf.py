@@ -1,131 +1,51 @@
 import numpy as np
-from .utils.btf_interpolator import BtfInterpolator
-from .utils.coord_system_transfer import orthogonal2spherical, mirror_uv
+import mitsuba as mi
+import drjit as dr
 
-import enoki as ek
-from mitsuba.core import Bitmap, Struct, Thread, math, Properties, Frame3f, Float, Vector3f, warp, Transform3f
-from mitsuba.render import BSDF, BSDFContext, BSDFFlags, BSDFSample3f, SurfaceInteraction3f, register_bsdf, Texture
+from .microfacet_sampling import MicrofacetSampling
 
-class MeasuredBTF(BSDF):
-    def __init__(self, props):
-        BSDF.__init__(self, props)
-        
-        # BTDFFのzipファイルのパス
-        self.m_filename = props["filename"]
-        
-        # 逆ガンマ補正をかけるかどうか
-        if props.has_property("apply_inv_gamma"):
-            self.m_apply_inv_gamma = props["apply_inv_gamma"]
-        else:
-            self.m_apply_inv_gamma = True
+from .btf_interpolator import BtfInterpolator
+from .ubo2003 import Ubo2003
 
-        # 反射率
-        if props.has_property("reflectance"):
-            self.m_reflectance = Float(props["reflectance"])
-        else:
-            self.m_reflectance = Float(1.0)
 
-        # Power parameter
-        if props.has_property("power_parameter"):
-            self.m_power_parameter = Float(props["power_parameter"])
-        else:
-            self.m_power_parameter = Float(4.0)
+class MeasuredBTF(MicrofacetSampling):
+    def __init__(self, props: mi.Properties) -> None:
+        super().__init__(props)
 
-        # Wrap mode
-        if props.has_property("wrap_mode"):
-            self.m_wrap_mode = str(props["wrap_mode"])
-        else:
-            self.m_wrap_mode = "repeat"
+        self.m_filename: str = props["filename"]  # Path to the BTF file
+        self.m_scale: float = props.get("scale", 1.0)  # Scale factor for reflectance
+        self.m_p: float = props.get("p", 4.0)  # Power parameter
+        self.m_k: int = props.get("k", 4)  # Number of nearest neighbors
+        self.m_gamma: float = props.get("gamma", 2.2)  # Gamma correction
 
-        # UVマップの変換
-        self.m_transform = Transform3f(props["to_uv"].extract())
-        
-        # 読み込んだBTF
-        self.btf = BtfInterpolator(self.m_filename, p=self.m_power_parameter)
-        
-        self.m_flags = BSDFFlags.DiffuseReflection | BSDFFlags.FrontSide
-        self.m_components = [self.m_flags]
+        to_uv = props.get("to_uv", mi.ScalarTransform4f())
+        self.m_transform = mi.Transform3f(to_uv.extract().matrix)
 
-    def get_btf(self, wi, wo, uv):
-        """
-        BTFの生の値を取得する
+        ubo = Ubo2003(self.m_filename)
+        images = ubo.images
+        angles = ubo.angles
+        self.btf_interp = BtfInterpolator(images, angles)
 
-        wi : enoki.scalar.Vector3f
-            Incident direction
-        
-        wo : enoki.scalar.Vector3f
-            Outgoing direction
+    def eval(self, ctx: mi.BSDFContext, si: mi.SurfaceInteraction3f, wo: mi.Vector3f, active: mi.Mask) -> mi.Spectrum:
+        cos_theta_i = mi.Frame3f.cos_theta(si.wi)
+        cos_theta_o = mi.Frame3f.cos_theta(wo)
+        active &= (cos_theta_i > 0.0) & (cos_theta_o > 0.0)
 
-        uv : enoki.scalar.Vector2f 
-            UV surface coordinates
-        """
-        # カメラ側の方向
-        _, tv, pv = orthogonal2spherical(*wi)
-        
-        # 光源側の方向
-        _, tl, pl = orthogonal2spherical(*wo)
-        
-        # 画像中の座標位置を求める
-        uv = self.m_transform.transform_point(uv)
+        if (dr.none(active)) or (not ctx.is_enabled(mi.BSDFFlags.GlossyReflection)):
+            return 0.0
 
-        # warp_modeがmirrorなら座標の変換
-        if self.m_wrap_mode == "mirror":
-            uv = mirror_uv(uv).T
+        uv = self.m_transform.transform_affine(si.uv)
 
-        u, v = uv
-        
-        # BTFの画素値を取得
-        bgr = self.btf.angles_uv_to_pixel(tl, pl, tv, pv, u, v)
-        
-        # 0.0~1.0にスケーリング
-        bgr = np.clip(bgr / 255.0 * self.m_reflectance, 0, 1)
-        
-        # 逆ガンマ補正をかける
-        if self.m_apply_inv_gamma:
-            bgr **= 2.2
+        # Convert to numpy arrays for BTF lookup
+        wl = np.asarray(wo).T  # (N, 3)
+        wv = np.asarray(si.wi).T  # (N, 3)
+        uv = np.asarray(uv).T  # (N, 2)
+        bgr = self.btf_interp(wl, wv, uv)
 
-        return Vector3f(bgr[..., ::-1])
+        bgr *= self.m_scale / 255.0  # scale
+        bgr **= self.m_gamma  # inverse gamma correction
+        rgb = bgr[..., ::-1]  # BGR -> RGB
 
-    def sample(self, ctx, si, sample1, sample2, active):
-        """
-        BSDF sampling
-        """
-        cos_theta_i = Frame3f.cos_theta(si.wi)
+        value = mi.Color3f(rgb.T) * dr.inv_pi
 
-        active &= cos_theta_i > 0
-
-        bs = BSDFSample3f()
-        bs.wo  = warp.square_to_cosine_hemisphere(sample2)
-        bs.pdf = warp.square_to_cosine_hemisphere_pdf(bs.wo)
-        bs.eta = 1.0
-        bs.sampled_type = +BSDFFlags.DiffuseReflection
-        bs.sampled_component = 0
-
-        value = self.get_btf(si.wi, bs.wo, si.uv) / Frame3f.cos_theta(bs.wo)
-
-        return ( bs, ek.select(active & (bs.pdf > 0.0), value, Vector3f(0)) )
-
-    def eval(self, ctx, si, wo, active):
-        """
-        Emitter sampling
-        """
-        if not ctx.is_enabled(BSDFFlags.DiffuseReflection):
-            return Vector3f(0)
-
-        cos_theta_i = Frame3f.cos_theta(si.wi) 
-        cos_theta_o = Frame3f.cos_theta(wo)
-
-        value = self.get_btf(si.wi, wo, si.uv) * math.InvPi
-
-        return ek.select((cos_theta_i > 0.0) & (cos_theta_o > 0.0), value, Vector3f(0))
-
-    def pdf(self, ctx, si, wo, active):
-        if not ctx.is_enabled(BSDFFlags.DiffuseReflection):
-            return Vector3f(0)
-
-        cos_theta_i = Frame3f.cos_theta(si.wi)
-        cos_theta_o = Frame3f.cos_theta(wo)
-
-        pdf = warp.square_to_cosine_hemisphere_pdf(wo)
-
-        return ek.select((cos_theta_i > 0.0) & (cos_theta_o > 0.0), pdf, 0.0)
+        return mi.depolarizer(value) & active

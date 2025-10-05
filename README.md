@@ -36,7 +36,7 @@ After placing the BTF dataset, you can render the scenes in the `scenes/` direct
 | gamma     | float     | Gamma correction applied to loaded texels. (Default: 2.2)                                                 |
 | to_uv     | transform | Optional UV transform. (Default: none)                                                                    |
 
-The measured BTF plugin supports two types of BTF datasets: UBO2003 and ATRIUM. Both datasets are available from [the University of Bonn](https://cg.cs.uni-bonn.de/btfdb). The following images show the appearance of two example materials from each dataset.
+The measured BTF plugin supports two types of BTF datasets: UBO2003 and ATRIUM. Both datasets are available from [BTF Database Bonn](https://cg.cs.uni-bonn.de/btfdb). The following images show the appearance of two example materials from each dataset.
 
 |               UBO2003 IMPALLA                |                ATRIUM CEILING                |
 | :------------------------------------------: | :------------------------------------------: |
